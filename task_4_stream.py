@@ -1,6 +1,8 @@
 import streamlit as st
 import joblib
 import re
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Page configuration
 st.set_page_config(page_title="Sentiment AI by Hafiz Zuhaib", page_icon="🤖")
@@ -18,7 +20,7 @@ except:
     st.error("Model files not found! Please save your model/vectorizer first.")
 
 # 2. UI Layout
-st.title("🧠 Twitter Sentiment Predictor")
+st.title("Twitter Sentiment Predictor")
 st.markdown("""
 Welcome to my NLP Project! This model was trained on **1.6 Million Tweets** using a 
 Logistic Regression algorithm and TF-IDF Vectorization.
@@ -43,15 +45,26 @@ if st.button("Predict Sentiment"):
         prediction = model.predict(vectorized_text)
         probs = model.predict_proba(vectorized_text) # The "Confidence" math
         
-        # UI Results
+        # # UI Results
         st.divider()
         sentiment = "Positive" if prediction[0] == 4 else "Negative"
-        confidence = max(probs[0]) * 100
-        
+        confidence = max(probs[0]) 
+
+        # Display Text Results
         col1, col2 = st.columns(2)
-        with col1:
-            st.metric("Predicted Sentiment", sentiment)
-        with col2:
-            st.metric("Confidence Score", f"{confidence:.2f}%")
-            
-        st.write(f"**Cleaned Tokens used for math:** `{cleaned}`")
+        col1.metric("Predicted Sentiment", sentiment)
+        col2.metric("Confidence Score", f"{confidence*100:.2f}%")
+
+        # --- SEABORN VISUALIZATION ---
+        st.write("### Model Probability Distribution")
+        
+        # Create the plot
+        fig, ax = plt.subplots(figsize=(10, 3))
+        # We use probs[0] which contains [prob_neg, prob_pos]
+        sns.barplot(x=probs[0], y=["Negative", "Positive"], palette=['#FF4B4B', '#00D4FF'], ax=ax)
+        
+        ax.set_xlim(0, 1) # Probability is always between 0 and 1
+        ax.set_xlabel("Probability")
+        
+        # Show plot in Streamlit
+        st.pyplot(fig)
