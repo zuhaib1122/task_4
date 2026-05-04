@@ -33,7 +33,7 @@ if st.button("Predict Sentiment"):
         st.warning("Please enter some text first!")
     else:
         # Step A: Clean
-        from task_4.py import clean_dataset # Importing our logic
+        from task_4 import clean_dataset # Importing our logic
         cleaned = clean_dataset(user_text)
         
         # Step B: Vectorize
